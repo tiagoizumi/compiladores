@@ -5,8 +5,6 @@
 #include <string.h>
 #include "parser.tab.h" // Inclui os tokens gerados pelo Bison
 
-int line_number = 1; // Contador de linhas
-
 void to_uppercase(char *str) {
     for (int i = 0; str[i]; i++) {
         str[i] = toupper((unsigned char)str[i]);
@@ -50,14 +48,12 @@ NUMBER  {DIGIT}+
 ">"         { printf("%s ", yytext); return GT; }
 
 [ \t]+      { /* Ignora espaços e tabulações */ }
-\n          { printf("\n"); line_number++; yylineno++;} // Conta novas linhas
+\n          { yylineno++; printf("\n"); } // `yylineno` já é atualizado automaticamente
 
 "//".*      { /* Ignora comentários de linha */ }
 "/*"([^*]|\*+[^*/])*\*+"/" { /* Ignora comentários de bloco */ }
 
-.           { printf("ERRO LEXICO: '%s' LINHA: %d\n", yytext, yylineno); }
-
-
+.           { printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); }
 
 %%
 

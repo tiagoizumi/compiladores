@@ -72,15 +72,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern int yylineno;
-extern char *yytext;
-
+extern int yylineno;  // Variável do Flex que conta as linhas
+extern char *yytext;  // Token atual    
 void yyerror(const char *s);
 int yylex();
 
+typedef struct node {
+    char *tipo;
+    struct node *esquerda;
+    struct node *direita;
+    char *valor;
+} Node;
+
+Node* cria_no(char *tipo, char *valor, Node *esquerda, Node *direita) {
+    Node* novo_no = (Node*)malloc(sizeof(Node));
+    if (novo_no == NULL) {
+        fprintf(stderr, "Erro de alocação de memória.\n");
+        exit(1);  // Ou retornar NULL e tratar o erro na função que chamou
+    }
+    novo_no->tipo = tipo;
+    novo_no->valor = valor;
+    novo_no->esquerda = esquerda;
+    novo_no->direita = direita;
+    return novo_no;
+}
+
+void imprime_arvore(Node *no, int nivel) {
+    if (no == NULL) return;
+
+    for (int i = 0; i < nivel; i++) {
+        printf("  ");
+    }
+    printf("%s", no->tipo);
+    if (no->valor) {
+        printf(": %s", no->valor);
+    }
+    printf("\n");
+
+    imprime_arvore(no->esquerda, nivel + 1);
+    imprime_arvore(no->direita, nivel + 1);
+}
+
+// Definindo YYSTYPE como ponteiro para Node
+#define YYSTYPE Node*
+
+Node *raiz_arvore;  // Variável global que armazenará a raiz da árvore
 
 
-#line 84 "parser.tab.c"
+#line 123 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -553,15 +592,15 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    23,    23,    25,    25,    27,    27,    29,    30,    32,
-      32,    34,    36,    36,    38,    38,    40,    40,    42,    44,
-      44,    46,    46,    48,    49,    50,    51,    52,    54,    56,
-      57,    59,    61,    62,    64,    65,    67,    68,    70,    71,
-      73,    73,    73,    73,    73,    73,    75,    75,    77,    77,
-      79,    79,    81,    81,    83,    84,    85,    86,    88,    90,
-      90,    92,    93
+       0,    63,    63,    66,    67,    71,    72,    75,    76,    79,
+      80,    83,    86,    87,    90,    91,    94,    95,    98,   101,
+     102,   105,   106,   109,   110,   111,   112,   113,   116,   119,
+     120,   123,   126,   127,   130,   131,   134,   135,   138,   139,
+     142,   143,   144,   145,   146,   147,   150,   151,   154,   155,
+     158,   159,   162,   163,   166,   167,   168,   169,   172,   175,
+     176,   179,   180
 };
 #endif
 
@@ -1189,8 +1228,375 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 2: /* programa: declaracao_lista  */
+#line 63 "parser.y"
+                     { yyval = cria_no("programa", NULL, yyvsp[0], NULL); raiz_arvore = yyval;}
+#line 1235 "parser.tab.c"
+    break;
 
-#line 1194 "parser.tab.c"
+  case 3: /* declaracao_lista: declaracao_lista declaracao  */
+#line 66 "parser.y"
+                                { yyval = cria_no("declaracao_lista", NULL, yyvsp[-1], yyvsp[0]);}
+#line 1241 "parser.tab.c"
+    break;
+
+  case 4: /* declaracao_lista: declaracao  */
+#line 67 "parser.y"
+                 {yyval = cria_no("declaracao_lista", NULL, yyvsp[0], NULL);
+}
+#line 1248 "parser.tab.c"
+    break;
+
+  case 5: /* declaracao: var_declaracao  */
+#line 71 "parser.y"
+                   { yyval = yyvsp[0];}
+#line 1254 "parser.tab.c"
+    break;
+
+  case 6: /* declaracao: fun_declaracao  */
+#line 72 "parser.y"
+                     { yyval = yyvsp[0];}
+#line 1260 "parser.tab.c"
+    break;
+
+  case 7: /* var_declaracao: tipo_especificador ID SEMICOLON  */
+#line 75 "parser.y"
+                                    { yyval = cria_no("var_declaracao", NULL, yyvsp[-2], NULL);}
+#line 1266 "parser.tab.c"
+    break;
+
+  case 8: /* var_declaracao: tipo_especificador ID LBRACE NUMBER RBRACE SEMICOLON  */
+#line 76 "parser.y"
+                                                           {yyval = cria_no("var_declaracao", NULL, yyvsp[-5], yyvsp[-2]);}
+#line 1272 "parser.tab.c"
+    break;
+
+  case 9: /* tipo_especificador: INT  */
+#line 79 "parser.y"
+        {yyval = cria_no("tipo_especificador", "INT", NULL, NULL);}
+#line 1278 "parser.tab.c"
+    break;
+
+  case 10: /* tipo_especificador: VOID  */
+#line 80 "parser.y"
+           {yyval = cria_no("tipo_especificador", "VOID", NULL, NULL);}
+#line 1284 "parser.tab.c"
+    break;
+
+  case 11: /* fun_declaracao: tipo_especificador ID LPAREN params RPAREN composto_decl  */
+#line 83 "parser.y"
+                                                             {yyval = cria_no("fun_declaracao", NULL, yyvsp[-5], yyvsp[0]); }
+#line 1290 "parser.tab.c"
+    break;
+
+  case 12: /* params: param_lista  */
+#line 86 "parser.y"
+                {yyval = yyvsp[0];}
+#line 1296 "parser.tab.c"
+    break;
+
+  case 13: /* params: VOID  */
+#line 87 "parser.y"
+           {yyval = cria_no("params", "VOID", NULL, NULL);}
+#line 1302 "parser.tab.c"
+    break;
+
+  case 14: /* param_lista: param_lista COMMA param  */
+#line 90 "parser.y"
+                            {yyval = cria_no("param_lista", NULL, yyvsp[-2], yyvsp[0]);}
+#line 1308 "parser.tab.c"
+    break;
+
+  case 15: /* param_lista: param  */
+#line 91 "parser.y"
+            {yyval = yyvsp[0];}
+#line 1314 "parser.tab.c"
+    break;
+
+  case 16: /* param: tipo_especificador ID  */
+#line 94 "parser.y"
+                          {yyval = cria_no("param", NULL, yyvsp[-1], NULL);}
+#line 1320 "parser.tab.c"
+    break;
+
+  case 17: /* param: tipo_especificador ID LBRACE RBRACE  */
+#line 95 "parser.y"
+                                          {yyval = cria_no("param", NULL, yyvsp[-3], NULL);}
+#line 1326 "parser.tab.c"
+    break;
+
+  case 18: /* composto_decl: LBRACE local_declaracoes statement_lista RBRACE  */
+#line 98 "parser.y"
+                                                    {yyval = cria_no("composto_decl", NULL, yyvsp[-2], yyvsp[-1]); }
+#line 1332 "parser.tab.c"
+    break;
+
+  case 19: /* local_declaracoes: local_declaracoes var_declaracao  */
+#line 101 "parser.y"
+                                     {yyval = cria_no("local_declaracoes", NULL, yyvsp[-1], yyvsp[0]);}
+#line 1338 "parser.tab.c"
+    break;
+
+  case 20: /* local_declaracoes: %empty  */
+#line 102 "parser.y"
+                  {yyval = NULL;}
+#line 1344 "parser.tab.c"
+    break;
+
+  case 21: /* statement_lista: statement_lista statement  */
+#line 105 "parser.y"
+                              {yyval = cria_no("statement_lista", NULL, yyvsp[-1], yyvsp[0]);}
+#line 1350 "parser.tab.c"
+    break;
+
+  case 22: /* statement_lista: %empty  */
+#line 106 "parser.y"
+                  {yyval = NULL;}
+#line 1356 "parser.tab.c"
+    break;
+
+  case 23: /* statement: expressao_decl  */
+#line 109 "parser.y"
+                   {yyval = yyvsp[0];}
+#line 1362 "parser.tab.c"
+    break;
+
+  case 24: /* statement: composto_decl  */
+#line 110 "parser.y"
+                    {yyval = yyvsp[0];}
+#line 1368 "parser.tab.c"
+    break;
+
+  case 25: /* statement: selecao_decl  */
+#line 111 "parser.y"
+                   {yyval = yyvsp[0];}
+#line 1374 "parser.tab.c"
+    break;
+
+  case 26: /* statement: iteracao_decl  */
+#line 112 "parser.y"
+                    {yyval = yyvsp[0];}
+#line 1380 "parser.tab.c"
+    break;
+
+  case 27: /* statement: retorno_decl  */
+#line 113 "parser.y"
+                   {yyval = yyvsp[0];}
+#line 1386 "parser.tab.c"
+    break;
+
+  case 28: /* expressao_decl: expressao SEMICOLON  */
+#line 116 "parser.y"
+                        {yyval = cria_no("expressao_decl", NULL, yyvsp[-1], NULL);}
+#line 1392 "parser.tab.c"
+    break;
+
+  case 29: /* selecao_decl: IF LPAREN expressao RPAREN statement  */
+#line 119 "parser.y"
+                                                    {yyval = cria_no("selecao_decl", "IF-THEN", yyvsp[-2], yyvsp[0]);}
+#line 1398 "parser.tab.c"
+    break;
+
+  case 30: /* selecao_decl: IF LPAREN expressao RPAREN statement ELSE statement  */
+#line 120 "parser.y"
+                                                          {yyval = cria_no("selecao_decl", "IF-ELSE", yyvsp[-4], yyvsp[-1]);}
+#line 1404 "parser.tab.c"
+    break;
+
+  case 31: /* iteracao_decl: WHILE LPAREN expressao RPAREN statement  */
+#line 123 "parser.y"
+                                            {yyval = cria_no("iteracao_decl", "WHILE", yyvsp[-2], yyvsp[0]);}
+#line 1410 "parser.tab.c"
+    break;
+
+  case 32: /* retorno_decl: RETURN SEMICOLON  */
+#line 126 "parser.y"
+                     {yyval = cria_no("retorno_decl", "RETURN", NULL, NULL);}
+#line 1416 "parser.tab.c"
+    break;
+
+  case 33: /* retorno_decl: RETURN expressao SEMICOLON  */
+#line 127 "parser.y"
+                                 {yyval = cria_no("retorno_decl", "RETURN", yyvsp[-1], NULL);}
+#line 1422 "parser.tab.c"
+    break;
+
+  case 34: /* expressao: var ASSIGN expressao  */
+#line 130 "parser.y"
+                         {yyval = cria_no("expressao", "ASSIGN", yyvsp[-2], yyvsp[0]);}
+#line 1428 "parser.tab.c"
+    break;
+
+  case 35: /* expressao: simples_expressao  */
+#line 131 "parser.y"
+                        {yyval = yyvsp[0];}
+#line 1434 "parser.tab.c"
+    break;
+
+  case 36: /* var: ID  */
+#line 134 "parser.y"
+       {yyval = cria_no("var", "ID", NULL, NULL);}
+#line 1440 "parser.tab.c"
+    break;
+
+  case 37: /* var: ID LBRACE expressao RBRACE  */
+#line 135 "parser.y"
+                                 {yyval = cria_no("var", "ID[LBRACE-EXP-RBRACE]", yyvsp[-1], NULL);}
+#line 1446 "parser.tab.c"
+    break;
+
+  case 38: /* simples_expressao: soma_expressao relacional soma_expressao  */
+#line 138 "parser.y"
+                                             {yyval = cria_no("simples_expressao", NULL, yyvsp[-2], yyvsp[0]);}
+#line 1452 "parser.tab.c"
+    break;
+
+  case 39: /* simples_expressao: soma_expressao  */
+#line 139 "parser.y"
+                     {yyval = yyvsp[0];}
+#line 1458 "parser.tab.c"
+    break;
+
+  case 40: /* relacional: LT  */
+#line 142 "parser.y"
+       {yyval = cria_no("relacional", "LT", NULL, NULL);}
+#line 1464 "parser.tab.c"
+    break;
+
+  case 41: /* relacional: LEQ  */
+#line 143 "parser.y"
+          {yyval = cria_no("relacional", "LEQ", NULL, NULL);}
+#line 1470 "parser.tab.c"
+    break;
+
+  case 42: /* relacional: GT  */
+#line 144 "parser.y"
+         {yyval = cria_no("relacional", "GT", NULL, NULL);}
+#line 1476 "parser.tab.c"
+    break;
+
+  case 43: /* relacional: GEQ  */
+#line 145 "parser.y"
+          {yyval = cria_no("relacional", "GEQ", NULL, NULL);}
+#line 1482 "parser.tab.c"
+    break;
+
+  case 44: /* relacional: EQ  */
+#line 146 "parser.y"
+         {yyval = cria_no("relacional", "EQ", NULL, NULL);}
+#line 1488 "parser.tab.c"
+    break;
+
+  case 45: /* relacional: NEQ  */
+#line 147 "parser.y"
+          {yyval = cria_no("relacional", "NEQ", NULL, NULL);}
+#line 1494 "parser.tab.c"
+    break;
+
+  case 46: /* soma_expressao: soma_expressao soma termo  */
+#line 150 "parser.y"
+                              {yyval = cria_no("soma_expressao", NULL, yyvsp[-2], yyvsp[0]);}
+#line 1500 "parser.tab.c"
+    break;
+
+  case 47: /* soma_expressao: termo  */
+#line 151 "parser.y"
+            {yyval = yyvsp[0];}
+#line 1506 "parser.tab.c"
+    break;
+
+  case 48: /* soma: PLUS  */
+#line 154 "parser.y"
+         {yyval = cria_no("soma", "PLUS", NULL, NULL);}
+#line 1512 "parser.tab.c"
+    break;
+
+  case 49: /* soma: MINUS  */
+#line 155 "parser.y"
+            {yyval = cria_no("soma", "MINUS", NULL, NULL);}
+#line 1518 "parser.tab.c"
+    break;
+
+  case 50: /* termo: termo mult fator  */
+#line 158 "parser.y"
+                     {yyval = cria_no("termo", NULL, yyvsp[-2], yyvsp[0]);}
+#line 1524 "parser.tab.c"
+    break;
+
+  case 51: /* termo: fator  */
+#line 159 "parser.y"
+            {yyval = yyvsp[0];}
+#line 1530 "parser.tab.c"
+    break;
+
+  case 52: /* mult: MULT  */
+#line 162 "parser.y"
+         {yyval = cria_no("mult", "MULT", NULL, NULL);}
+#line 1536 "parser.tab.c"
+    break;
+
+  case 53: /* mult: DIV  */
+#line 163 "parser.y"
+          {yyval = cria_no("mult", "DIV", NULL, NULL);}
+#line 1542 "parser.tab.c"
+    break;
+
+  case 54: /* fator: LPAREN expressao RPAREN  */
+#line 166 "parser.y"
+                            {yyval = cria_no("fator", "LPAREN-EXP-RPAREN", yyvsp[-1], NULL);}
+#line 1548 "parser.tab.c"
+    break;
+
+  case 55: /* fator: var  */
+#line 167 "parser.y"
+          {yyval = yyvsp[0];}
+#line 1554 "parser.tab.c"
+    break;
+
+  case 56: /* fator: ativacao  */
+#line 168 "parser.y"
+               {yyval = yyvsp[0];}
+#line 1560 "parser.tab.c"
+    break;
+
+  case 57: /* fator: NUMBER  */
+#line 169 "parser.y"
+             {yyval = cria_no("fator", "NUMBER", NULL, NULL);}
+#line 1566 "parser.tab.c"
+    break;
+
+  case 58: /* ativacao: ID LPAREN args RPAREN  */
+#line 172 "parser.y"
+                          {yyval = cria_no("ativacao", "ID LPAREN-ARGS-RPAREN", yyvsp[-1], NULL);}
+#line 1572 "parser.tab.c"
+    break;
+
+  case 59: /* args: arg_lista  */
+#line 175 "parser.y"
+              {yyval = yyvsp[0];}
+#line 1578 "parser.tab.c"
+    break;
+
+  case 60: /* args: %empty  */
+#line 176 "parser.y"
+                  {yyval = NULL;}
+#line 1584 "parser.tab.c"
+    break;
+
+  case 61: /* arg_lista: arg_lista COMMA expressao  */
+#line 179 "parser.y"
+                              {yyval = cria_no("arg_lista", NULL, yyvsp[-2], yyvsp[0]);}
+#line 1590 "parser.tab.c"
+    break;
+
+  case 62: /* arg_lista: expressao  */
+#line 180 "parser.y"
+                {yyval = yyvsp[0];}
+#line 1596 "parser.tab.c"
+    break;
+
+
+#line 1600 "parser.tab.c"
 
       default: break;
     }
@@ -1383,13 +1789,16 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 95 "parser.y"
+#line 182 "parser.y"
 
 
 void yyerror(const char *s) {
-    fprintf(stderr, "ERRO SINTATICO: TOKEN '%s' LINHA: %d\n", yytext, yylineno);
+    fprintf(stderr, "ERRO SINTÁTICO: \"%s\" LINHA: %d\n", yytext, yylineno);
 }
 
 int main() {
-    return yyparse();
+    yyparse();  // Executa o parsing
+    printf("Árvore de Análise Sintática:\n");
+    imprime_arvore(raiz_arvore, 0);  // Imprime a árvore
+    return 0;
 }

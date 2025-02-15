@@ -486,15 +486,13 @@ char *yytext;
 #include <string.h>
 #include "parser.tab.h" // Inclui os tokens gerados pelo Bison
 
-int line_number = 1; // Contador de linhas
-
 void to_uppercase(char *str) {
     for (int i = 0; str[i]; i++) {
         str[i] = toupper((unsigned char)str[i]);
     }
 }
-#line 497 "lex.yy.c"
-#line 498 "lex.yy.c"
+#line 495 "lex.yy.c"
+#line 496 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -711,10 +709,10 @@ YY_DECL
 		}
 
 	{
-#line 22 "analisador.l"
+#line 20 "analisador.l"
 
 
-#line 718 "lex.yy.c"
+#line 716 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -773,162 +771,162 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 24 "analisador.l"
+#line 22 "analisador.l"
 { printf("%s ", yytext); return IF; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 25 "analisador.l"
+#line 23 "analisador.l"
 { printf("%s ", yytext); return ELSE; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 26 "analisador.l"
+#line 24 "analisador.l"
 { printf("%s ", yytext); return WHILE; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 27 "analisador.l"
+#line 25 "analisador.l"
 { printf("%s ", yytext); return RETURN; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 28 "analisador.l"
+#line 26 "analisador.l"
 { printf("%s ", yytext); return INT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 29 "analisador.l"
+#line 27 "analisador.l"
 { printf("%s ", yytext); return VOID; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 31 "analisador.l"
+#line 29 "analisador.l"
 { printf("%s ", yytext); return ID; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 32 "analisador.l"
+#line 30 "analisador.l"
 { printf("%s ", yytext); return NUMBER; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 34 "analisador.l"
+#line 32 "analisador.l"
 { printf("%s ", yytext); return PLUS; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 35 "analisador.l"
+#line 33 "analisador.l"
 { printf("%s ", yytext); return MINUS; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 36 "analisador.l"
+#line 34 "analisador.l"
 { printf("%s ", yytext); return MULT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 37 "analisador.l"
+#line 35 "analisador.l"
 { printf("%s ", yytext); return DIV; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 38 "analisador.l"
+#line 36 "analisador.l"
 { printf("%s ", yytext); return ASSIGN; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 39 "analisador.l"
+#line 37 "analisador.l"
 { printf("%s\n", yytext); return SEMICOLON; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 40 "analisador.l"
+#line 38 "analisador.l"
 { printf("%s ", yytext); return COMMA; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 41 "analisador.l"
+#line 39 "analisador.l"
 { printf("%s", yytext); return LPAREN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 42 "analisador.l"
+#line 40 "analisador.l"
 { printf("%s ", yytext); return RPAREN; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 43 "analisador.l"
+#line 41 "analisador.l"
 { printf("\n%s\n", yytext); return LBRACE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 44 "analisador.l"
+#line 42 "analisador.l"
 { printf("\n%s\n", yytext); return RBRACE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 45 "analisador.l"
+#line 43 "analisador.l"
 { printf("%s ", yytext); return LEQ; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 46 "analisador.l"
+#line 44 "analisador.l"
 { printf("%s ", yytext); return GEQ; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 47 "analisador.l"
+#line 45 "analisador.l"
 { printf("%s ", yytext); return EQ; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 48 "analisador.l"
+#line 46 "analisador.l"
 { printf("%s ", yytext); return NEQ; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 49 "analisador.l"
+#line 47 "analisador.l"
 { printf("%s ", yytext); return LT; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 50 "analisador.l"
+#line 48 "analisador.l"
 { printf("%s ", yytext); return GT; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 52 "analisador.l"
+#line 50 "analisador.l"
 { /* Ignora espaços e tabulações */ }
 	YY_BREAK
 case 27:
 /* rule 27 can match eol */
 YY_RULE_SETUP
-#line 53 "analisador.l"
-{ printf("\n"); line_number++; yylineno++;} // Conta novas linhas
+#line 51 "analisador.l"
+{ yylineno++; printf("\n"); } // `yylineno` já é atualizado automaticamente
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 55 "analisador.l"
+#line 53 "analisador.l"
 { /* Ignora comentários de linha */ }
 	YY_BREAK
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 56 "analisador.l"
+#line 54 "analisador.l"
 { /* Ignora comentários de bloco */ }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 58 "analisador.l"
-{ printf("ERRO LEXICO: '%s' LINHA: %d\n", yytext, yylineno); }
+#line 56 "analisador.l"
+{ printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 62 "analisador.l"
+#line 58 "analisador.l"
 ECHO;
 	YY_BREAK
-#line 932 "lex.yy.c"
+#line 930 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1933,7 +1931,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 62 "analisador.l"
+#line 58 "analisador.l"
 
 
 int yywrap() {
