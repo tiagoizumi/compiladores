@@ -1,4 +1,3 @@
 int main(void) {
-    #unknown_token
     return 0;
 }
