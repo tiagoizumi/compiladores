@@ -38,6 +38,8 @@ NUMBER  {DIGIT}+
 ","         { printf("%s ", yytext); return COMMA; }
 "("         { printf("%s", yytext); return LPAREN; }
 ")"         { printf("%s ", yytext); return RPAREN; }
+"["         { printf("%s ", yytext); return LBRACE; }
+"]"         { printf("%s ", yytext); return RBRACE; }
 "{"         { printf("\n%s\n", yytext); return LBRACE; }
 "}"         { printf("\n%s\n", yytext); return RBRACE; }
 "<="        { printf("%s ", yytext); return LEQ; }
@@ -51,7 +53,15 @@ NUMBER  {DIGIT}+
 \n          { yylineno++; printf("\n"); } // `yylineno` já é atualizado automaticamente
 
 "//".*      { /* Ignora comentários de linha */ }
-"/*"([^*]|\*+[^*/])*\*+"/" { /* Ignora comentários de bloco */ }
+"/*"([^*]|\*+[^*/])*\*+"/" {
+    int i;
+    for (i = 0; yytext[i] != '\0'; i++) {
+        if (yytext[i] == '\n') {
+            yylineno++;
+        }
+    }
+    /* Ignora comentários de bloco */
+}
 
 .           { printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); }
 

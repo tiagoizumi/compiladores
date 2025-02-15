@@ -1249,13 +1249,13 @@ yyreduce:
 
   case 5: /* declaracao: var_declaracao  */
 #line 71 "parser.y"
-                   { yyval = yyvsp[0];}
+                   { yyval = cria_no("declaracao", NULL, yyvsp[0], NULL);}
 #line 1254 "parser.tab.c"
     break;
 
   case 6: /* declaracao: fun_declaracao  */
 #line 72 "parser.y"
-                     { yyval = yyvsp[0];}
+                     { yyval = cria_no("declaracao", NULL, yyvsp[0], NULL);}
 #line 1260 "parser.tab.c"
     break;
 

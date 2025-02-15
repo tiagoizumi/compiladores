@@ -68,8 +68,8 @@ declaracao_lista:
 };
 
 declaracao:
-    var_declaracao { $$ = $1;}
-    | fun_declaracao { $$ = $1;};
+    var_declaracao { $$ = cria_no("declaracao", NULL, $1, NULL);}
+    | fun_declaracao { $$ = cria_no("declaracao", NULL, $1, NULL);};
 
 var_declaracao:
     tipo_especificador ID SEMICOLON { $$ = cria_no("var_declaracao", NULL, $1, NULL);}
