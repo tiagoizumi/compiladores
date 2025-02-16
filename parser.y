@@ -8,6 +8,34 @@ extern int yylineno;  // Variável do Flex que conta as linhas
 extern char *yytext;  // Token atual    
 void yyerror(const char *s);
 int yylex();
+#define MAX_SCOPE_DEPTH 10
+
+char currScope[30] = "main";  // Current scope
+char scopeStack[MAX_SCOPE_DEPTH][30];  // Stack to track nested scopes
+int scopeDepth = 0;  // Current depth of the scope stack
+
+// Push the current scope onto the stack
+void pushScope() {
+    if (scopeDepth < MAX_SCOPE_DEPTH) {
+        strcpy(scopeStack[scopeDepth], currScope);
+        scopeDepth++;
+    } else {
+        fprintf(stderr, "Scope stack overflow!\n");
+        exit(1);
+    }
+}
+
+// Pop the previous scope from the stack
+void popScope() {
+    if (scopeDepth > 0) {
+        scopeDepth--;
+        strcpy(currScope, scopeStack[scopeDepth]);
+    } else {
+        fprintf(stderr, "Scope stack underflow!\n");
+        exit(1);
+    }
+}
+
 
 typedef struct node {
     char *tipo;           // Tipo do nó (ex: "int", "float", "var", "func")
@@ -71,8 +99,8 @@ void imprime_arvore(Node *no, int nivel) {
         printf("| ");
     }
     printf("%s", no->tipo);
-    if (no->valor) {
-        printf(": %s", no->valor);
+    if (no->identificador) {
+        printf(": %s", no->identificador);
     }
     printf("\n");
 
@@ -125,10 +153,9 @@ tipo_especificador:
     | VOID {$$ = cria_no("tipo_especificador", "void", NULL, folha("VOID", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
 
 fun_declaracao:
-    tipo_especificador ID {} LPAREN params RPAREN composto_decl {
-
-        strcpy(currScope, $2->identificador);
-        $$ = cria_no("fun_declaracao", NULL, NULL, $1, $2, $3, $4, $5, $6, NULL, NULL); 
+    tipo_especificador ID {strcpy(currScope, $2->identificador); pushScope();} LPAREN params RPAREN composto_decl {
+        popScope();
+        $$ = cria_no("fun_declaracao", NULL, NULL, $1, $2, $4, $5, $6, $7, NULL, NULL); 
         adiciona_simbolo($2->identificador, $1->valor, currScope);
     };
 
