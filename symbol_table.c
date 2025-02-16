@@ -65,7 +65,7 @@ void libera_tabela_simbolos() {
 void imprime_tabela_simbolos() {
     Simbolo *atual = tabela_simbolos;
     while (atual) {
-        printf("Nome: %s, Tipo: %s, Escopo: %s\n", atual->nome, atual->tipo, 
+        printf("Nome: %20s, Tipo: %10s, Escopo: %10s\n", atual->nome, atual->tipo, 
                atual->escopo ? atual->escopo : "Global");
         atual = atual->prox;
     }

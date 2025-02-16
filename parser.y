@@ -1,5 +1,5 @@
 %{
-#include <string.h> // Adicione esta linha
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "symbol_table.h"
@@ -117,15 +117,20 @@ declaracao:
 var_declaracao:
     tipo_especificador ID SEMICOLON { 
         $$ = cria_no("var_declaracao", NULL, $2->identificador, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);
-        adiciona_simbolo($2->identificador, $1->tipo, "global"); // Adiciona à tabela
+        adiciona_simbolo($2->identificador, $1->valor, currScope); // Adiciona à tabela
     };
 
 tipo_especificador:
-    INT {$$ = cria_no("tipo_especificador", NULL, NULL, folha("INT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-    | VOID {$$ = cria_no("tipo_especificador", NULL, NULL, folha("VOID", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
+    INT {$$ = cria_no("tipo_especificador", "int", NULL, folha("INT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+    | VOID {$$ = cria_no("tipo_especificador", "void", NULL, folha("VOID", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
 
 fun_declaracao:
-    tipo_especificador ID LPAREN params RPAREN composto_decl {$$ = cria_no("fun_declaracao", NULL, NULL, $1, $2, $3, $4, $5, $6, NULL, NULL); };
+    tipo_especificador ID {} LPAREN params RPAREN composto_decl {
+
+        strcpy(currScope, $2->identificador);
+        $$ = cria_no("fun_declaracao", NULL, NULL, $1, $2, $3, $4, $5, $6, NULL, NULL); 
+        adiciona_simbolo($2->identificador, $1->valor, currScope);
+    };
 
 params:
     param_lista {$$ = cria_no("params", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
@@ -136,11 +141,19 @@ param_lista:
     | param {$$ = cria_no("param_lista", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
 
 param:
-    tipo_especificador ID {$$ = cria_no("param", NULL, NULL, $1, $2, NULL, NULL, NULL, NULL, NULL, NULL);}
-    | tipo_especificador ID LBRACE RBRACE {$$ = cria_no("param", NULL, NULL, $1, $2, $3, $4, NULL, NULL, NULL, NULL);};
+    tipo_especificador ID {
+        $$ = cria_no("param", NULL, NULL, $1, $2, NULL, NULL, NULL, NULL, NULL, NULL);
+        adiciona_simbolo($2->identificador, $1->valor, currScope);
+        }
+    | tipo_especificador ID LBRACE RBRACE {
+        $$ = cria_no("param", NULL, NULL, $1, $2, $3, $4, NULL, NULL, NULL, NULL);
+        adiciona_simbolo($2->identificador, $1->valor, currScope);
+        };
 
 composto_decl:
-    LBRACE local_declaracoes statement_lista RBRACE {$$ = cria_no("composto_decl", NULL, NULL, $1, $2, $3, $4, NULL, NULL, NULL, NULL); };
+    LBRACE local_declaracoes statement_lista RBRACE {
+        $$ = cria_no("composto_decl", NULL, NULL, $1, $2, $3, $4, NULL, NULL, NULL, NULL); 
+        };
 
 local_declaracoes:
     local_declaracoes var_declaracao {$$ = cria_no("local_declaracoes", NULL, NULL, $1, $2, NULL, NULL, NULL, NULL, NULL, NULL);}

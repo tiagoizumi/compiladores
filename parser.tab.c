@@ -69,15 +69,42 @@
 /* First part of user prologue.  */
 #line 1 "parser.y"
 
-#include <string.h> // Adicione esta linha
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "symbol_table.h"
+#define MAX_SCOPE_DEPTH 5
 
 extern int yylineno;  // Variável do Flex que conta as linhas
 extern char *yytext;  // Token atual    
 void yyerror(const char *s);
 int yylex();
+
+
+char currScope[30] = "main";
+char scopeStack[MAX_SCOPE_DEPTH][30];
+int scopeDepth = 0;
+
+void pushScope() {
+    if (scopeDepth < MAX_SCOPE_DEPTH) {
+        strcpy(scopeStack[scopeDepth], currScope);
+        scopeDepth++;
+    } else {
+        fprintf(stderr, "Scope stack overflow!\n");
+        exit(1);
+    }
+}
+
+// Pop the previous scope from the stack
+void popScope() {
+    if (scopeDepth > 0) {
+        scopeDepth--;
+        strcpy(currScope, scopeStack[scopeDepth]);
+    } else {
+        fprintf(stderr, "Scope stack underflow!\n");
+        exit(1);
+    }
+}
 
 typedef struct node {
     char *tipo;           // Tipo do nó (ex: "int", "float", "var", "func")
@@ -163,7 +190,7 @@ void imprime_arvore(Node *no, int nivel) {
 Node *raiz_arvore;  // Variável global que armazenará a raiz da árvore
 
 
-#line 167 "parser.tab.c"
+#line 194 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -231,25 +258,26 @@ enum yysymbol_kind_t
   YYSYMBOL_param_lista = 37,               /* param_lista  */
   YYSYMBOL_param = 38,                     /* param  */
   YYSYMBOL_composto_decl = 39,             /* composto_decl  */
-  YYSYMBOL_local_declaracoes = 40,         /* local_declaracoes  */
-  YYSYMBOL_statement_lista = 41,           /* statement_lista  */
-  YYSYMBOL_statement = 42,                 /* statement  */
-  YYSYMBOL_expressao_decl = 43,            /* expressao_decl  */
-  YYSYMBOL_selecao_decl = 44,              /* selecao_decl  */
-  YYSYMBOL_iteracao_decl = 45,             /* iteracao_decl  */
-  YYSYMBOL_retorno_decl = 46,              /* retorno_decl  */
-  YYSYMBOL_expressao = 47,                 /* expressao  */
-  YYSYMBOL_var = 48,                       /* var  */
-  YYSYMBOL_simples_expressao = 49,         /* simples_expressao  */
-  YYSYMBOL_relacional = 50,                /* relacional  */
-  YYSYMBOL_soma_expressao = 51,            /* soma_expressao  */
-  YYSYMBOL_soma = 52,                      /* soma  */
-  YYSYMBOL_termo = 53,                     /* termo  */
-  YYSYMBOL_mult = 54,                      /* mult  */
-  YYSYMBOL_fator = 55,                     /* fator  */
-  YYSYMBOL_ativacao = 56,                  /* ativacao  */
-  YYSYMBOL_args = 57,                      /* args  */
-  YYSYMBOL_arg_lista = 58                  /* arg_lista  */
+  YYSYMBOL_40_1 = 40,                      /* @1  */
+  YYSYMBOL_local_declaracoes = 41,         /* local_declaracoes  */
+  YYSYMBOL_statement_lista = 42,           /* statement_lista  */
+  YYSYMBOL_statement = 43,                 /* statement  */
+  YYSYMBOL_expressao_decl = 44,            /* expressao_decl  */
+  YYSYMBOL_selecao_decl = 45,              /* selecao_decl  */
+  YYSYMBOL_iteracao_decl = 46,             /* iteracao_decl  */
+  YYSYMBOL_retorno_decl = 47,              /* retorno_decl  */
+  YYSYMBOL_expressao = 48,                 /* expressao  */
+  YYSYMBOL_var = 49,                       /* var  */
+  YYSYMBOL_simples_expressao = 50,         /* simples_expressao  */
+  YYSYMBOL_relacional = 51,                /* relacional  */
+  YYSYMBOL_soma_expressao = 52,            /* soma_expressao  */
+  YYSYMBOL_soma = 53,                      /* soma  */
+  YYSYMBOL_termo = 54,                     /* termo  */
+  YYSYMBOL_mult = 55,                      /* mult  */
+  YYSYMBOL_fator = 56,                     /* fator  */
+  YYSYMBOL_ativacao = 57,                  /* ativacao  */
+  YYSYMBOL_args = 58,                      /* args  */
+  YYSYMBOL_arg_lista = 59                  /* arg_lista  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -577,16 +605,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  9
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   90
+#define YYLAST   91
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  29
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  30
+#define YYNNTS  31
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  61
+#define YYNRULES  62
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  97
+#define YYNSTATES  98
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   283
@@ -636,15 +664,15 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int16 yyrline[] =
 {
-       0,   107,   107,   110,   111,   114,   115,   118,   124,   125,
-     128,   131,   132,   135,   136,   139,   140,   143,   146,   147,
-     150,   151,   154,   155,   156,   157,   158,   161,   164,   165,
-     168,   170,   171,   174,   175,   178,   179,   182,   183,   186,
-     187,   188,   189,   190,   191,   194,   195,   198,   199,   202,
-     203,   206,   207,   210,   211,   212,   213,   216,   219,   220,
-     223,   224
+       0,   134,   134,   137,   138,   141,   142,   145,   151,   152,
+     155,   164,   165,   168,   169,   172,   176,   182,   182,   192,
+     193,   196,   197,   200,   201,   202,   203,   204,   207,   210,
+     211,   214,   216,   217,   220,   221,   224,   225,   228,   229,
+     232,   233,   234,   235,   236,   237,   240,   241,   244,   245,
+     248,   249,   252,   253,   256,   257,   258,   259,   262,   265,
+     266,   269,   270
 };
 #endif
 
@@ -666,10 +694,11 @@ static const char *const yytname[] =
   "LBRACE", "RBRACE", "LEQ", "GEQ", "EQ", "NEQ", "LT", "GT", "$accept",
   "programa", "declaracao_lista", "declaracao", "var_declaracao",
   "tipo_especificador", "fun_declaracao", "params", "param_lista", "param",
-  "composto_decl", "local_declaracoes", "statement_lista", "statement",
-  "expressao_decl", "selecao_decl", "iteracao_decl", "retorno_decl",
-  "expressao", "var", "simples_expressao", "relacional", "soma_expressao",
-  "soma", "termo", "mult", "fator", "ativacao", "args", "arg_lista", YY_NULLPTR
+  "composto_decl", "@1", "local_declaracoes", "statement_lista",
+  "statement", "expressao_decl", "selecao_decl", "iteracao_decl",
+  "retorno_decl", "expressao", "var", "simples_expressao", "relacional",
+  "soma_expressao", "soma", "termo", "mult", "fator", "ativacao", "args",
+  "arg_lista", YY_NULLPTR
 };
 
 static const char *
@@ -679,7 +708,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-63)
+#define YYPACT_NINF (-88)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -693,16 +722,16 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      12,   -63,   -63,    24,    12,   -63,   -63,    20,   -63,   -63,
-     -63,   -15,   -63,    49,    17,    35,    41,    46,   -63,    44,
-      47,    12,    48,   -63,   -63,   -63,   -63,    12,   -63,    56,
-       6,    52,    53,    54,    23,    22,   -63,    -5,   -63,   -63,
-     -63,   -63,   -63,   -63,   -63,    57,    51,   -63,    26,    45,
-     -63,   -63,    -5,    -5,   -63,    58,    -5,    -5,    59,   -63,
-      -5,   -63,   -63,   -63,   -63,   -63,   -63,   -63,   -63,    -5,
-      -5,   -63,   -63,    -5,    60,    61,   -63,   -63,    62,    65,
-      55,   -63,   -63,   -63,    50,    45,   -63,    25,    25,   -63,
-      -5,   -63,    66,   -63,   -63,    25,   -63
+      39,   -88,   -88,     7,    39,   -88,   -88,     1,   -88,   -88,
+     -88,    24,   -88,    54,    -5,    10,     4,    12,   -88,    16,
+      34,    39,    38,   -88,   -88,   -88,   -88,   -88,    39,   -88,
+      35,     6,    52,    51,    53,    23,    40,   -88,    47,   -88,
+     -88,   -88,   -88,   -88,   -88,   -88,    56,    58,   -88,    26,
+      50,   -88,   -88,    47,    47,   -88,    59,    47,    47,    57,
+     -88,    47,   -88,   -88,   -88,   -88,   -88,   -88,   -88,   -88,
+      47,    47,   -88,   -88,    47,    60,    61,   -88,   -88,    62,
+      65,    49,   -88,   -88,   -88,    55,    50,   -88,    25,    25,
+     -88,    47,   -88,    70,   -88,   -88,    25,   -88
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -712,30 +741,32 @@ static const yytype_int8 yydefact[] =
 {
        0,     8,     9,     0,     2,     4,     5,     0,     6,     1,
        3,     0,     7,     0,     9,     0,     0,    11,    14,    15,
-       0,     0,     0,    19,    10,    13,    16,    21,    18,     0,
-       0,     0,     0,     0,     0,    35,    56,     0,    17,    23,
-      20,    22,    24,    25,    26,     0,    54,    34,    38,    46,
-      50,    55,     0,     0,    31,     0,    59,     0,     0,    27,
-       0,    47,    48,    40,    42,    43,    44,    39,    41,     0,
-       0,    51,    52,     0,     0,     0,    32,    61,     0,    58,
-       0,    53,    33,    54,    37,    45,    49,     0,     0,    57,
-       0,    36,    28,    30,    60,     0,    29
+       0,     0,     0,    17,    10,    13,    16,    20,    22,    19,
+       0,     0,     0,     0,     0,     0,    36,    57,     0,    18,
+      24,    21,    23,    25,    26,    27,     0,    55,    35,    39,
+      47,    51,    56,     0,     0,    32,     0,    60,     0,     0,
+      28,     0,    48,    49,    41,    43,    44,    45,    40,    42,
+       0,     0,    52,    53,     0,     0,     0,    33,    62,     0,
+      59,     0,    54,    34,    55,    38,    46,    50,     0,     0,
+      58,     0,    37,    29,    31,    61,     0,    30
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -63,   -63,   -63,    72,    63,   -12,   -63,   -63,   -63,    64,
-      67,   -63,   -63,   -40,   -63,   -63,   -63,   -63,   -34,   -62,
-     -63,   -63,     9,   -63,    14,   -63,    13,   -63,   -63,   -63
+     -88,   -88,   -88,    74,    63,    -7,   -88,   -88,   -88,    64,
+      66,   -88,   -88,   -88,   -87,   -88,   -88,   -88,   -88,   -35,
+     -66,   -88,   -88,     9,   -88,    13,   -88,    14,   -88,   -88,
+     -88
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
        0,     3,     4,     5,     6,     7,     8,    16,    17,    18,
-      39,    27,    30,    40,    41,    42,    43,    44,    45,    46,
-      47,    69,    48,    70,    49,    73,    50,    51,    78,    79
+      40,    27,    28,    31,    41,    42,    43,    44,    45,    46,
+      47,    48,    70,    49,    71,    50,    74,    51,    52,    79,
+      80
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -743,30 +774,30 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      55,    15,    12,    58,    13,    35,    36,    83,    83,    15,
-      32,    83,    33,    34,    37,    29,    35,    36,    74,    75,
-       1,     2,    77,    80,     9,    37,    82,    23,    38,    32,
-      11,    33,    34,    35,    36,    35,    36,   -12,    61,    62,
-      54,    56,    37,    57,    37,    19,    23,    92,    93,    63,
-      64,    65,    66,    67,    68,    96,    94,     1,    14,    71,
-      72,    20,    61,    62,    21,    22,    31,    60,    23,    12,
-      26,    95,    52,    53,    59,    76,    10,    91,    84,    81,
-      87,    88,    89,    90,    85,    25,    86,    24,     0,     0,
-      28
+      56,    93,    94,    59,    84,    84,    15,     9,    84,    97,
+      33,    11,    34,    35,    15,   -12,    36,    37,    75,    76,
+      19,    30,    78,    81,    20,    38,    83,    23,    39,    33,
+      21,    34,    35,    36,    37,    36,    37,    22,    62,    63,
+      55,    12,    38,    13,    38,    32,    23,     1,     2,    64,
+      65,    66,    67,    68,    69,    23,    95,    36,    37,    57,
+      26,    58,     1,    14,    72,    73,    38,    62,    63,    12,
+      53,    92,    54,    60,    61,    96,    77,    82,    10,    85,
+      88,    89,    90,    91,    86,    25,    24,     0,    87,     0,
+       0,    29
 };
 
 static const yytype_int8 yycheck[] =
 {
-      34,    13,    17,    37,    19,    10,    11,    69,    70,    21,
-       4,    73,     6,     7,    19,    27,    10,    11,    52,    53,
-       8,     9,    56,    57,     0,    19,    60,    21,    22,     4,
-      10,     6,     7,    10,    11,    10,    11,    20,    12,    13,
-      17,    19,    19,    21,    19,    10,    21,    87,    88,    23,
-      24,    25,    26,    27,    28,    95,    90,     8,     9,    14,
-      15,    20,    12,    13,    18,    21,    10,    16,    21,    17,
-      22,     5,    19,    19,    17,    17,     4,    22,    69,    20,
-      20,    20,    20,    18,    70,    21,    73,    20,    -1,    -1,
-      27
+      35,    88,    89,    38,    70,    71,    13,     0,    74,    96,
+       4,    10,     6,     7,    21,    20,    10,    11,    53,    54,
+      10,    28,    57,    58,    20,    19,    61,    21,    22,     4,
+      18,     6,     7,    10,    11,    10,    11,    21,    12,    13,
+      17,    17,    19,    19,    19,    10,    21,     8,     9,    23,
+      24,    25,    26,    27,    28,    21,    91,    10,    11,    19,
+      22,    21,     8,     9,    14,    15,    19,    12,    13,    17,
+      19,    22,    19,    17,    16,     5,    17,    20,     4,    70,
+      20,    20,    20,    18,    71,    21,    20,    -1,    74,    -1,
+      -1,    28
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
@@ -775,38 +806,38 @@ static const yytype_int8 yystos[] =
 {
        0,     8,     9,    30,    31,    32,    33,    34,    35,     0,
       32,    10,    17,    19,     9,    34,    36,    37,    38,    10,
-      20,    18,    21,    21,    39,    38,    22,    40,    33,    34,
-      41,    10,     4,     6,     7,    10,    11,    19,    22,    39,
-      42,    43,    44,    45,    46,    47,    48,    49,    51,    53,
-      55,    56,    19,    19,    17,    47,    19,    21,    47,    17,
-      16,    12,    13,    23,    24,    25,    26,    27,    28,    50,
-      52,    14,    15,    54,    47,    47,    17,    47,    57,    58,
-      47,    20,    47,    48,    51,    53,    55,    20,    20,    20,
-      18,    22,    42,    42,    47,     5,    42
+      20,    18,    21,    21,    39,    38,    22,    40,    41,    33,
+      34,    42,    10,     4,     6,     7,    10,    11,    19,    22,
+      39,    43,    44,    45,    46,    47,    48,    49,    50,    52,
+      54,    56,    57,    19,    19,    17,    48,    19,    21,    48,
+      17,    16,    12,    13,    23,    24,    25,    26,    27,    28,
+      51,    53,    14,    15,    55,    48,    48,    17,    48,    58,
+      59,    48,    20,    48,    49,    52,    54,    56,    20,    20,
+      20,    18,    22,    43,    43,    48,     5,    43
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
        0,    29,    30,    31,    31,    32,    32,    33,    34,    34,
-      35,    36,    36,    37,    37,    38,    38,    39,    40,    40,
-      41,    41,    42,    42,    42,    42,    42,    43,    44,    44,
-      45,    46,    46,    47,    47,    48,    48,    49,    49,    50,
-      50,    50,    50,    50,    50,    51,    51,    52,    52,    53,
-      53,    54,    54,    55,    55,    55,    55,    56,    57,    57,
-      58,    58
+      35,    36,    36,    37,    37,    38,    38,    40,    39,    41,
+      41,    42,    42,    43,    43,    43,    43,    43,    44,    45,
+      45,    46,    47,    47,    48,    48,    49,    49,    50,    50,
+      51,    51,    51,    51,    51,    51,    52,    52,    53,    53,
+      54,    54,    55,    55,    56,    56,    56,    56,    57,    58,
+      58,    59,    59
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     2,     1,     1,     1,     3,     1,     1,
-       6,     1,     1,     3,     1,     2,     4,     4,     2,     0,
-       2,     0,     1,     1,     1,     1,     1,     2,     5,     7,
-       5,     2,     3,     3,     1,     1,     4,     3,     1,     1,
-       1,     1,     1,     1,     1,     3,     1,     1,     1,     3,
-       1,     1,     1,     3,     1,     1,     1,     4,     1,     0,
-       3,     1
+       6,     1,     1,     3,     1,     2,     4,     0,     5,     2,
+       0,     2,     0,     1,     1,     1,     1,     1,     2,     5,
+       7,     5,     2,     3,     3,     1,     1,     4,     3,     1,
+       1,     1,     1,     1,     1,     1,     3,     1,     1,     1,
+       3,     1,     1,     1,     3,     1,     1,     1,     4,     1,
+       0,     3,     1
 };
 
 
@@ -1270,370 +1301,394 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* programa: declaracao_lista  */
-#line 107 "parser.y"
+#line 134 "parser.y"
                      { yyval = cria_no("programa", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL); raiz_arvore = yyval;}
-#line 1276 "parser.tab.c"
+#line 1307 "parser.tab.c"
     break;
 
   case 3: /* declaracao_lista: declaracao_lista declaracao  */
-#line 110 "parser.y"
+#line 137 "parser.y"
                                 { yyval = cria_no("declaracao_lista", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1282 "parser.tab.c"
+#line 1313 "parser.tab.c"
     break;
 
   case 4: /* declaracao_lista: declaracao  */
-#line 111 "parser.y"
+#line 138 "parser.y"
                  {yyval = cria_no("declaracao_lista", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1288 "parser.tab.c"
+#line 1319 "parser.tab.c"
     break;
 
   case 5: /* declaracao: var_declaracao  */
-#line 114 "parser.y"
+#line 141 "parser.y"
                      { yyval = cria_no("declaracao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1294 "parser.tab.c"
+#line 1325 "parser.tab.c"
     break;
 
   case 6: /* declaracao: fun_declaracao  */
-#line 115 "parser.y"
+#line 142 "parser.y"
                      { yyval = cria_no("declaracao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1300 "parser.tab.c"
+#line 1331 "parser.tab.c"
     break;
 
   case 7: /* var_declaracao: tipo_especificador ID SEMICOLON  */
-#line 118 "parser.y"
+#line 145 "parser.y"
                                     { 
         yyval = cria_no("var_declaracao", NULL, yyvsp[-1]->identificador, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);
-        adiciona_simbolo(yyvsp[-1]->identificador, yyvsp[-2]->tipo, "global"); // Adiciona à tabela
+        adiciona_simbolo(yyvsp[-1]->identificador, yyvsp[-2]->valor, currScope); // Adiciona à tabela
     }
-#line 1309 "parser.tab.c"
+#line 1340 "parser.tab.c"
     break;
 
   case 8: /* tipo_especificador: INT  */
-#line 124 "parser.y"
-        {yyval = cria_no("tipo_especificador", NULL, NULL, folha("INT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1315 "parser.tab.c"
+#line 151 "parser.y"
+        {yyval = cria_no("tipo_especificador", "int", NULL, folha("INT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1346 "parser.tab.c"
     break;
 
   case 9: /* tipo_especificador: VOID  */
-#line 125 "parser.y"
-           {yyval = cria_no("tipo_especificador", NULL, NULL, folha("VOID", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1321 "parser.tab.c"
+#line 152 "parser.y"
+           {yyval = cria_no("tipo_especificador", "void", NULL, folha("VOID", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1352 "parser.tab.c"
     break;
 
   case 10: /* fun_declaracao: tipo_especificador ID LPAREN params RPAREN composto_decl  */
-#line 128 "parser.y"
-                                                             {yyval = cria_no("fun_declaracao", NULL, NULL, yyvsp[-5], yyvsp[-4], yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL); }
-#line 1327 "parser.tab.c"
+#line 155 "parser.y"
+                                                             {
+
+        pushScope();
+        strcpy(currScope, yyvsp[-4]->identificador);
+        yyval = cria_no("fun_declaracao", NULL, NULL, yyvsp[-5], yyvsp[-4], yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL); 
+        adiciona_simbolo(yyvsp[-4]->identificador, yyvsp[-5]->valor, currScope);
+    }
+#line 1364 "parser.tab.c"
     break;
 
   case 11: /* params: param_lista  */
-#line 131 "parser.y"
+#line 164 "parser.y"
                 {yyval = cria_no("params", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1333 "parser.tab.c"
+#line 1370 "parser.tab.c"
     break;
 
   case 12: /* params: VOID  */
-#line 132 "parser.y"
+#line 165 "parser.y"
            {yyval = cria_no("params", NULL, NULL, folha("VOID", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1339 "parser.tab.c"
+#line 1376 "parser.tab.c"
     break;
 
   case 13: /* param_lista: param_lista COMMA param  */
-#line 135 "parser.y"
+#line 168 "parser.y"
                             {yyval = cria_no("param_lista", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
-#line 1345 "parser.tab.c"
+#line 1382 "parser.tab.c"
     break;
 
   case 14: /* param_lista: param  */
-#line 136 "parser.y"
+#line 169 "parser.y"
             {yyval = cria_no("param_lista", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1351 "parser.tab.c"
+#line 1388 "parser.tab.c"
     break;
 
   case 15: /* param: tipo_especificador ID  */
-#line 139 "parser.y"
-                          {yyval = cria_no("param", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1357 "parser.tab.c"
+#line 172 "parser.y"
+                          {
+        yyval = cria_no("param", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);
+        adiciona_simbolo(yyvsp[0]->identificador, yyvsp[-1]->valor, currScope);
+        }
+#line 1397 "parser.tab.c"
     break;
 
   case 16: /* param: tipo_especificador ID LBRACE RBRACE  */
-#line 140 "parser.y"
-                                          {yyval = cria_no("param", NULL, NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);}
-#line 1363 "parser.tab.c"
+#line 176 "parser.y"
+                                          {
+        yyval = cria_no("param", NULL, NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);
+        adiciona_simbolo(yyvsp[-2]->identificador, yyvsp[-3]->valor, currScope);
+        }
+#line 1406 "parser.tab.c"
     break;
 
-  case 17: /* composto_decl: LBRACE local_declaracoes statement_lista RBRACE  */
-#line 143 "parser.y"
-                                                    {yyval = cria_no("composto_decl", NULL, NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL); }
-#line 1369 "parser.tab.c"
-    break;
-
-  case 18: /* local_declaracoes: local_declaracoes var_declaracao  */
-#line 146 "parser.y"
-                                     {yyval = cria_no("local_declaracoes", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1375 "parser.tab.c"
-    break;
-
-  case 19: /* local_declaracoes: %empty  */
-#line 147 "parser.y"
-                  {yyval = NULL;}
-#line 1381 "parser.tab.c"
-    break;
-
-  case 20: /* statement_lista: statement_lista statement  */
-#line 150 "parser.y"
-                              {yyval = cria_no("statement_lista", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1387 "parser.tab.c"
-    break;
-
-  case 21: /* statement_lista: %empty  */
-#line 151 "parser.y"
-                  {yyval = NULL;}
-#line 1393 "parser.tab.c"
-    break;
-
-  case 22: /* statement: expressao_decl  */
-#line 154 "parser.y"
-                   {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1399 "parser.tab.c"
-    break;
-
-  case 23: /* statement: composto_decl  */
-#line 155 "parser.y"
-                    {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1405 "parser.tab.c"
-    break;
-
-  case 24: /* statement: selecao_decl  */
-#line 156 "parser.y"
-                   {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1411 "parser.tab.c"
-    break;
-
-  case 25: /* statement: iteracao_decl  */
-#line 157 "parser.y"
-                    {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1417 "parser.tab.c"
-    break;
-
-  case 26: /* statement: retorno_decl  */
-#line 158 "parser.y"
-                   {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1423 "parser.tab.c"
-    break;
-
-  case 27: /* expressao_decl: expressao SEMICOLON  */
-#line 161 "parser.y"
-                        {yyval = cria_no("expressao_decl", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1429 "parser.tab.c"
-    break;
-
-  case 28: /* selecao_decl: IF LPAREN expressao RPAREN statement  */
-#line 164 "parser.y"
-                                                    {yyval = cria_no("selecao_decl", "IF-THEN", NULL, folha("IF", NULL), yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL);}
-#line 1435 "parser.tab.c"
-    break;
-
-  case 29: /* selecao_decl: IF LPAREN expressao RPAREN statement ELSE statement  */
-#line 165 "parser.y"
-                                                          {yyval = cria_no("selecao_decl", "IF-ELSE", NULL, folha("IF", NULL), yyvsp[-5], yyvsp[-4], yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL);}
-#line 1441 "parser.tab.c"
-    break;
-
-  case 30: /* iteracao_decl: WHILE LPAREN expressao RPAREN statement  */
-#line 168 "parser.y"
-                                            {yyval = cria_no("iteracao_decl", "WHILE", NULL, folha("WHILE", NULL), yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL);}
-#line 1447 "parser.tab.c"
-    break;
-
-  case 31: /* retorno_decl: RETURN SEMICOLON  */
-#line 170 "parser.y"
-                     {yyval = cria_no("retorno_decl", "RETURN", NULL, folha("RETURN", NULL), yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1453 "parser.tab.c"
-    break;
-
-  case 32: /* retorno_decl: RETURN expressao SEMICOLON  */
-#line 171 "parser.y"
-                                 {yyval = cria_no("retorno_decl", "RETURN", NULL, folha("RETURN", NULL), yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
-#line 1459 "parser.tab.c"
-    break;
-
-  case 33: /* expressao: var ASSIGN expressao  */
-#line 174 "parser.y"
-                         {yyval = cria_no("expressao", "ASSIGN", NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
-#line 1465 "parser.tab.c"
-    break;
-
-  case 34: /* expressao: simples_expressao  */
-#line 175 "parser.y"
-                        {yyval = cria_no("expressao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1471 "parser.tab.c"
-    break;
-
-  case 35: /* var: ID  */
-#line 178 "parser.y"
-       {yyval = cria_no("var", "ID", NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1477 "parser.tab.c"
-    break;
-
-  case 36: /* var: ID LBRACE expressao RBRACE  */
-#line 179 "parser.y"
-                                 {yyval = cria_no("var", "ID[LBRACE-EXP-RBRACE]", NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);}
-#line 1483 "parser.tab.c"
-    break;
-
-  case 37: /* simples_expressao: soma_expressao relacional soma_expressao  */
+  case 17: /* @1: %empty  */
 #line 182 "parser.y"
-                                             {yyval = cria_no("simples_expressao", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
-#line 1489 "parser.tab.c"
+           {
+        strcpy(currScope, strcat(currScope, " (interno)"));  // Or generate a unique name for the block
+        pushScope();  // Enter a new block scope
+    }
+#line 1415 "parser.tab.c"
     break;
 
-  case 38: /* simples_expressao: soma_expressao  */
-#line 183 "parser.y"
-                     {yyval = cria_no("simples_expressao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1495 "parser.tab.c"
-    break;
-
-  case 39: /* relacional: LT  */
+  case 18: /* composto_decl: LBRACE @1 local_declaracoes statement_lista RBRACE  */
 #line 186 "parser.y"
-       {yyval = cria_no("relacional", "LT", NULL, folha("LT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1501 "parser.tab.c"
+                                             {
+        popScope();  // Exit the block scope
+        yyval = cria_no("composto_decl", NULL, NULL, yyvsp[-4], yyvsp[-3], yyvsp[-2], yyvsp[-1], NULL, NULL, NULL, NULL);
+    }
+#line 1424 "parser.tab.c"
     break;
 
-  case 40: /* relacional: LEQ  */
-#line 187 "parser.y"
-          {yyval = cria_no("relacional", "LEQ", NULL, folha("LEQ", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1507 "parser.tab.c"
+  case 19: /* local_declaracoes: local_declaracoes var_declaracao  */
+#line 192 "parser.y"
+                                     {yyval = cria_no("local_declaracoes", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1430 "parser.tab.c"
     break;
 
-  case 41: /* relacional: GT  */
-#line 188 "parser.y"
-         {yyval = cria_no("relacional", "GT", NULL, folha("GT",NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1513 "parser.tab.c"
-    break;
-
-  case 42: /* relacional: GEQ  */
-#line 189 "parser.y"
-          {yyval = cria_no("relacional", "GEQ", NULL, folha("GEQ", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1519 "parser.tab.c"
-    break;
-
-  case 43: /* relacional: EQ  */
-#line 190 "parser.y"
-         {yyval = cria_no("relacional", "EQ", NULL, folha("EQ",NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1525 "parser.tab.c"
-    break;
-
-  case 44: /* relacional: NEQ  */
-#line 191 "parser.y"
-          {yyval = cria_no("relacional", "NEQ", NULL, folha("NEQ",NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1531 "parser.tab.c"
-    break;
-
-  case 45: /* soma_expressao: soma_expressao soma termo  */
-#line 194 "parser.y"
-                              {yyval = cria_no("soma_expressao", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
-#line 1537 "parser.tab.c"
-    break;
-
-  case 46: /* soma_expressao: termo  */
-#line 195 "parser.y"
-            {yyval = cria_no("soma_expressao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1543 "parser.tab.c"
-    break;
-
-  case 47: /* soma: PLUS  */
-#line 198 "parser.y"
-         {yyval = cria_no("soma", "PLUS", NULL, folha("PLUS", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1549 "parser.tab.c"
-    break;
-
-  case 48: /* soma: MINUS  */
-#line 199 "parser.y"
-            {yyval = cria_no("soma", "MINUS", NULL, folha("MINUS", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1555 "parser.tab.c"
-    break;
-
-  case 49: /* termo: termo mult fator  */
-#line 202 "parser.y"
-                     {yyval = cria_no("termo", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
-#line 1561 "parser.tab.c"
-    break;
-
-  case 50: /* termo: fator  */
-#line 203 "parser.y"
-            {yyval = cria_no("termo", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1567 "parser.tab.c"
-    break;
-
-  case 51: /* mult: MULT  */
-#line 206 "parser.y"
-         {yyval = cria_no("mult", "MULT", NULL, folha("MULT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1573 "parser.tab.c"
-    break;
-
-  case 52: /* mult: DIV  */
-#line 207 "parser.y"
-          {yyval = cria_no("mult", "DIV", NULL, folha("DIV", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1579 "parser.tab.c"
-    break;
-
-  case 53: /* fator: LPAREN expressao RPAREN  */
-#line 210 "parser.y"
-                            {yyval = cria_no("fator", "LPAREN-EXP-RPAREN", NULL, folha("LPAREN", NULL), yyvsp[-1], folha("RPAREN", NULL), NULL, NULL, NULL, NULL, NULL);}
-#line 1585 "parser.tab.c"
-    break;
-
-  case 54: /* fator: var  */
-#line 211 "parser.y"
-          {yyval = cria_no("fator", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1591 "parser.tab.c"
-    break;
-
-  case 55: /* fator: ativacao  */
-#line 212 "parser.y"
-               {yyval = cria_no("fator", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1597 "parser.tab.c"
-    break;
-
-  case 56: /* fator: NUMBER  */
-#line 213 "parser.y"
-             {yyval = cria_no("fator", "NUMBER", NULL, folha("NUMBER", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1603 "parser.tab.c"
-    break;
-
-  case 57: /* ativacao: ID LPAREN args RPAREN  */
-#line 216 "parser.y"
-                          {yyval = cria_no("ativacao", "ID LPAREN-ARGS-RPAREN", NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);}
-#line 1609 "parser.tab.c"
-    break;
-
-  case 58: /* args: arg_lista  */
-#line 219 "parser.y"
-              {yyval = cria_no("arg_lista", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1615 "parser.tab.c"
-    break;
-
-  case 59: /* args: %empty  */
-#line 220 "parser.y"
+  case 20: /* local_declaracoes: %empty  */
+#line 193 "parser.y"
                   {yyval = NULL;}
-#line 1621 "parser.tab.c"
+#line 1436 "parser.tab.c"
     break;
 
-  case 60: /* arg_lista: arg_lista COMMA expressao  */
-#line 223 "parser.y"
-                              {yyval = cria_no("arg_lista", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
-#line 1627 "parser.tab.c"
+  case 21: /* statement_lista: statement_lista statement  */
+#line 196 "parser.y"
+                              {yyval = cria_no("statement_lista", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1442 "parser.tab.c"
     break;
 
-  case 61: /* arg_lista: expressao  */
+  case 22: /* statement_lista: %empty  */
+#line 197 "parser.y"
+                  {yyval = NULL;}
+#line 1448 "parser.tab.c"
+    break;
+
+  case 23: /* statement: expressao_decl  */
+#line 200 "parser.y"
+                   {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1454 "parser.tab.c"
+    break;
+
+  case 24: /* statement: composto_decl  */
+#line 201 "parser.y"
+                    {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1460 "parser.tab.c"
+    break;
+
+  case 25: /* statement: selecao_decl  */
+#line 202 "parser.y"
+                   {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1466 "parser.tab.c"
+    break;
+
+  case 26: /* statement: iteracao_decl  */
+#line 203 "parser.y"
+                    {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1472 "parser.tab.c"
+    break;
+
+  case 27: /* statement: retorno_decl  */
+#line 204 "parser.y"
+                   {yyval = cria_no("statement", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1478 "parser.tab.c"
+    break;
+
+  case 28: /* expressao_decl: expressao SEMICOLON  */
+#line 207 "parser.y"
+                        {yyval = cria_no("expressao_decl", NULL, NULL, yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1484 "parser.tab.c"
+    break;
+
+  case 29: /* selecao_decl: IF LPAREN expressao RPAREN statement  */
+#line 210 "parser.y"
+                                                    {yyval = cria_no("selecao_decl", "IF-THEN", NULL, folha("IF", NULL), yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL);}
+#line 1490 "parser.tab.c"
+    break;
+
+  case 30: /* selecao_decl: IF LPAREN expressao RPAREN statement ELSE statement  */
+#line 211 "parser.y"
+                                                          {yyval = cria_no("selecao_decl", "IF-ELSE", NULL, folha("IF", NULL), yyvsp[-5], yyvsp[-4], yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL);}
+#line 1496 "parser.tab.c"
+    break;
+
+  case 31: /* iteracao_decl: WHILE LPAREN expressao RPAREN statement  */
+#line 214 "parser.y"
+                                            {yyval = cria_no("iteracao_decl", "WHILE", NULL, folha("WHILE", NULL), yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL);}
+#line 1502 "parser.tab.c"
+    break;
+
+  case 32: /* retorno_decl: RETURN SEMICOLON  */
+#line 216 "parser.y"
+                     {yyval = cria_no("retorno_decl", "RETURN", NULL, folha("RETURN", NULL), yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1508 "parser.tab.c"
+    break;
+
+  case 33: /* retorno_decl: RETURN expressao SEMICOLON  */
+#line 217 "parser.y"
+                                 {yyval = cria_no("retorno_decl", "RETURN", NULL, folha("RETURN", NULL), yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
+#line 1514 "parser.tab.c"
+    break;
+
+  case 34: /* expressao: var ASSIGN expressao  */
+#line 220 "parser.y"
+                         {yyval = cria_no("expressao", "ASSIGN", NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
+#line 1520 "parser.tab.c"
+    break;
+
+  case 35: /* expressao: simples_expressao  */
+#line 221 "parser.y"
+                        {yyval = cria_no("expressao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1526 "parser.tab.c"
+    break;
+
+  case 36: /* var: ID  */
 #line 224 "parser.y"
+       {yyval = cria_no("var", "ID", NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1532 "parser.tab.c"
+    break;
+
+  case 37: /* var: ID LBRACE expressao RBRACE  */
+#line 225 "parser.y"
+                                 {yyval = cria_no("var", "ID[LBRACE-EXP-RBRACE]", NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);}
+#line 1538 "parser.tab.c"
+    break;
+
+  case 38: /* simples_expressao: soma_expressao relacional soma_expressao  */
+#line 228 "parser.y"
+                                             {yyval = cria_no("simples_expressao", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
+#line 1544 "parser.tab.c"
+    break;
+
+  case 39: /* simples_expressao: soma_expressao  */
+#line 229 "parser.y"
+                     {yyval = cria_no("simples_expressao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1550 "parser.tab.c"
+    break;
+
+  case 40: /* relacional: LT  */
+#line 232 "parser.y"
+       {yyval = cria_no("relacional", "LT", NULL, folha("LT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1556 "parser.tab.c"
+    break;
+
+  case 41: /* relacional: LEQ  */
+#line 233 "parser.y"
+          {yyval = cria_no("relacional", "LEQ", NULL, folha("LEQ", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1562 "parser.tab.c"
+    break;
+
+  case 42: /* relacional: GT  */
+#line 234 "parser.y"
+         {yyval = cria_no("relacional", "GT", NULL, folha("GT",NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1568 "parser.tab.c"
+    break;
+
+  case 43: /* relacional: GEQ  */
+#line 235 "parser.y"
+          {yyval = cria_no("relacional", "GEQ", NULL, folha("GEQ", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1574 "parser.tab.c"
+    break;
+
+  case 44: /* relacional: EQ  */
+#line 236 "parser.y"
+         {yyval = cria_no("relacional", "EQ", NULL, folha("EQ",NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1580 "parser.tab.c"
+    break;
+
+  case 45: /* relacional: NEQ  */
+#line 237 "parser.y"
+          {yyval = cria_no("relacional", "NEQ", NULL, folha("NEQ",NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1586 "parser.tab.c"
+    break;
+
+  case 46: /* soma_expressao: soma_expressao soma termo  */
+#line 240 "parser.y"
+                              {yyval = cria_no("soma_expressao", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
+#line 1592 "parser.tab.c"
+    break;
+
+  case 47: /* soma_expressao: termo  */
+#line 241 "parser.y"
+            {yyval = cria_no("soma_expressao", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1598 "parser.tab.c"
+    break;
+
+  case 48: /* soma: PLUS  */
+#line 244 "parser.y"
+         {yyval = cria_no("soma", "PLUS", NULL, folha("PLUS", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1604 "parser.tab.c"
+    break;
+
+  case 49: /* soma: MINUS  */
+#line 245 "parser.y"
+            {yyval = cria_no("soma", "MINUS", NULL, folha("MINUS", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1610 "parser.tab.c"
+    break;
+
+  case 50: /* termo: termo mult fator  */
+#line 248 "parser.y"
+                     {yyval = cria_no("termo", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
+#line 1616 "parser.tab.c"
+    break;
+
+  case 51: /* termo: fator  */
+#line 249 "parser.y"
+            {yyval = cria_no("termo", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1622 "parser.tab.c"
+    break;
+
+  case 52: /* mult: MULT  */
+#line 252 "parser.y"
+         {yyval = cria_no("mult", "MULT", NULL, folha("MULT", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1628 "parser.tab.c"
+    break;
+
+  case 53: /* mult: DIV  */
+#line 253 "parser.y"
+          {yyval = cria_no("mult", "DIV", NULL, folha("DIV", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1634 "parser.tab.c"
+    break;
+
+  case 54: /* fator: LPAREN expressao RPAREN  */
+#line 256 "parser.y"
+                            {yyval = cria_no("fator", "LPAREN-EXP-RPAREN", NULL, folha("LPAREN", NULL), yyvsp[-1], folha("RPAREN", NULL), NULL, NULL, NULL, NULL, NULL);}
+#line 1640 "parser.tab.c"
+    break;
+
+  case 55: /* fator: var  */
+#line 257 "parser.y"
+          {yyval = cria_no("fator", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1646 "parser.tab.c"
+    break;
+
+  case 56: /* fator: ativacao  */
+#line 258 "parser.y"
+               {yyval = cria_no("fator", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1652 "parser.tab.c"
+    break;
+
+  case 57: /* fator: NUMBER  */
+#line 259 "parser.y"
+             {yyval = cria_no("fator", "NUMBER", NULL, folha("NUMBER", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1658 "parser.tab.c"
+    break;
+
+  case 58: /* ativacao: ID LPAREN args RPAREN  */
+#line 262 "parser.y"
+                          {yyval = cria_no("ativacao", "ID LPAREN-ARGS-RPAREN", NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);}
+#line 1664 "parser.tab.c"
+    break;
+
+  case 59: /* args: arg_lista  */
+#line 265 "parser.y"
+              {yyval = cria_no("arg_lista", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+#line 1670 "parser.tab.c"
+    break;
+
+  case 60: /* args: %empty  */
+#line 266 "parser.y"
+                  {yyval = NULL;}
+#line 1676 "parser.tab.c"
+    break;
+
+  case 61: /* arg_lista: arg_lista COMMA expressao  */
+#line 269 "parser.y"
+                              {yyval = cria_no("arg_lista", NULL, NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);}
+#line 1682 "parser.tab.c"
+    break;
+
+  case 62: /* arg_lista: expressao  */
+#line 270 "parser.y"
                 {yyval = cria_no("arg_lista", NULL, NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-#line 1633 "parser.tab.c"
+#line 1688 "parser.tab.c"
     break;
 
 
-#line 1637 "parser.tab.c"
+#line 1692 "parser.tab.c"
 
       default: break;
     }
@@ -1826,7 +1881,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 225 "parser.y"
+#line 271 "parser.y"
 
 
 void yyerror(const char *s) {
