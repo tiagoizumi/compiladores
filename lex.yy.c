@@ -953,7 +953,7 @@ YY_RULE_SETUP
 case 32:
 YY_RULE_SETUP
 #line 82 "analisador.l"
-{ printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); }
+{ printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); exit(1);}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP

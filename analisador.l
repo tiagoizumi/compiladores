@@ -79,7 +79,7 @@ NUMBER  {DIGIT}+
     /* Ignora comentários de bloco */
 }
 
-.           { printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); }
+.           { printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); exit(1);}
 
 %%
 
