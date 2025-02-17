@@ -1,11 +1,9 @@
 %{
-// Declaração antecipada de Node para evitar erros
 typedef struct node Node;
 
-// Define YYSTYPE como Node* para compatibilidade com o parser
 #define YYSTYPE Node*
 
-#include "parser.tab.h" // Inclui os tokens gerados pelo Bison
+#include "parser.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -36,13 +34,13 @@ NUMBER  {DIGIT}+
 "void"      { printf("%s ", yytext); return VOID; }
 
 {ID}        { 
-    yylval = folha("ID", yytext); // Passa yytext como identificador
+    yylval = folha("ID", yytext);
     printf("%s ", yytext); 
     return ID; 
 }
 
 {NUMBER}    { 
-                yylval = folha("NUMBER", NULL); // Números não têm identificador
+                yylval = folha("NUMBER", NULL);
                 printf("%s ", yytext); 
                 return NUMBER; 
              }

@@ -4,15 +4,15 @@
 #include <stdlib.h>
 #include "symbol_table.h"
 
-extern int yylineno;  // Variável do Flex que conta as linhas
-extern char *yytext;  // Token atual    
-void yyerror(const char *s);
+extern int yylineno;
+extern char *yytext;
+void yyerror(const char *s);%
 int yylex();
 #define MAX_SCOPE_DEPTH 10
 
-char currScope[30] = "main";  // Current scope
-char scopeStack[MAX_SCOPE_DEPTH][30];  // Stack to track nested scopes
-int scopeDepth = 0;  // Current depth of the scope stack
+char currScope[30] = "main";  
+char scopeStack[MAX_SCOPE_DEPTH][30];  
+int scopeDepth = 0;  
 
 void pushScope() {
     if (scopeDepth < MAX_SCOPE_DEPTH) {
@@ -36,8 +36,8 @@ void popScope() {
 
 
 typedef struct node {
-    char *tipo;           // Tipo do nó (ex: "int", "float", "var", "func")
-    char *identificador;  // Nome do identificador (ex: nome de uma variável ou função)
+    char *tipo;
+    char *identificador;
     struct node *filho1;
     struct node *filho2;
     struct node *filho3;
@@ -46,7 +46,7 @@ typedef struct node {
     struct node *filho6;
     struct node *filho7;
     struct node *filho8;
-    char *valor;          // Valor literal, se houver
+    char *valor;
 } Node;
 
 
@@ -54,7 +54,7 @@ Node* cria_no(char *tipo, char *valor,char *identificador, Node *filho1, Node *f
     Node* novo_no = (Node*)malloc(sizeof(Node));
     if (novo_no == NULL) {
         fprintf(stderr, "Erro de alocação de memória.\n");
-        exit(1);  // Ou retornar NULL e tratar o erro na função que chamou
+        exit(1);
     }
     novo_no->tipo = tipo;
     novo_no->valor = valor;
@@ -76,7 +76,7 @@ Node* folha(char *tipo, char *identificador) {
         fprintf(stderr, "Erro de alocação de memória.\n");
         exit(1);
     }
-    novo_no->tipo = strdup(tipo); // Usar strdup para alocar cópia
+    novo_no->tipo = strdup(tipo);
     novo_no->identificador = identificador ? strdup(identificador) : NULL;
     novo_no->valor = NULL;
     novo_no->filho1 = NULL;
@@ -113,10 +113,9 @@ void imprime_arvore(Node *no, int nivel) {
 
 }
 
-// Definindo YYSTYPE como ponteiro para Node
 #define YYSTYPE Node*
 
-Node *raiz_arvore;  // Variável global que armazenará a raiz da árvore
+Node *raiz_arvore;
 
 %}
 
@@ -147,7 +146,7 @@ var_declaracao:
             fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (variável já declarada)\n", $2->identificador, yylineno);
             exit(1);
         }
-        adiciona_simbolo($2->identificador, $1->valor, currScope); // Adiciona à tabela
+        adiciona_simbolo($2->identificador, $1->valor, currScope);
     };
 
 tipo_especificador:
@@ -278,7 +277,7 @@ mult:
 fator:
     LPAREN expressao RPAREN {$$ = cria_no("fator", "LPAREN-EXP-RPAREN", NULL, folha("LPAREN", NULL), $2, folha("RPAREN", NULL), NULL, NULL, NULL, NULL, NULL);}
     | var {$$ = cria_no("fator", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-    | ativacao {$$ = cria_no("fator", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);} // Adicione esta linha
+    | ativacao {$$ = cria_no("fator", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);} 
     | NUMBER {$$ = cria_no("fator", "NUMBER", NULL, folha("NUMBER", NULL), NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
 
 ativacao:
@@ -298,13 +297,13 @@ void yyerror(const char *s) {
 }
 
 int main() {
-    yyparse();  // Executa o parsing (já deve adicionar símbolos durante a análise)
+    yyparse();
     printf("Árvore de Análise Sintática:\n");
-    imprime_arvore(raiz_arvore, 0);  // Imprime a árvore
+    imprime_arvore(raiz_arvore, 0);
 
     printf("\nTabela de Símbolos:\n");
-    imprime_tabela_simbolos();  // Imprime os símbolos coletados
+    imprime_tabela_simbolos();
 
-    libera_tabela_simbolos();   // Libera memória da tabela
+    libera_tabela_simbolos();
     return 0;
 }
