@@ -481,13 +481,11 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "analisador.l"
 #line 2 "analisador.l"
-// Declaração antecipada de Node para evitar erros
 typedef struct node Node;
 
-// Define YYSTYPE como Node* para compatibilidade com o parser
 #define YYSTYPE Node*
 
-#include "parser.tab.h" // Inclui os tokens gerados pelo Bison
+#include "parser.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -500,8 +498,8 @@ void to_uppercase(char *str) {
         str[i] = toupper((unsigned char)str[i]);
     }
 }
-#line 504 "lex.yy.c"
-#line 505 "lex.yy.c"
+#line 502 "lex.yy.c"
+#line 503 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -718,11 +716,11 @@ YY_DECL
 		}
 
 	{
-#line 28 "analisador.l"
+#line 26 "analisador.l"
 
 
 
-#line 726 "lex.yy.c"
+#line 724 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -781,167 +779,167 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 31 "analisador.l"
+#line 29 "analisador.l"
 { printf("%s ", yytext); return IF; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 32 "analisador.l"
+#line 30 "analisador.l"
 { printf("%s ", yytext); return ELSE; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 33 "analisador.l"
+#line 31 "analisador.l"
 { printf("%s ", yytext); return WHILE; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 34 "analisador.l"
+#line 32 "analisador.l"
 { printf("%s ", yytext); return RETURN; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 35 "analisador.l"
+#line 33 "analisador.l"
 { printf("%s ", yytext); return INT; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 36 "analisador.l"
+#line 34 "analisador.l"
 { printf("%s ", yytext); return VOID; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 38 "analisador.l"
+#line 36 "analisador.l"
 { 
-    yylval = folha("ID", yytext); // Passa yytext como identificador
+    yylval = folha("ID", yytext);
     printf("%s ", yytext); 
     return ID; 
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 44 "analisador.l"
+#line 42 "analisador.l"
 { 
-                yylval = folha("NUMBER", NULL); // Números não têm identificador
+                yylval = folha("NUMBER", NULL);
                 printf("%s ", yytext); 
                 return NUMBER; 
              }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 50 "analisador.l"
+#line 48 "analisador.l"
 { yylval = folha("PLUS", NULL); printf("%s ", yytext); return PLUS; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 51 "analisador.l"
+#line 49 "analisador.l"
 { yylval = folha("MINUS", NULL); printf("%s ", yytext); return MINUS; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 52 "analisador.l"
+#line 50 "analisador.l"
 { yylval = folha("MULT", NULL); printf("%s ", yytext); return MULT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 53 "analisador.l"
+#line 51 "analisador.l"
 { yylval = folha("DIV", NULL); printf("%s ", yytext); return DIV; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 54 "analisador.l"
+#line 52 "analisador.l"
 { yylval = folha("ASSIGN", NULL); printf("%s ", yytext); return ASSIGN; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 55 "analisador.l"
+#line 53 "analisador.l"
 { yylval = folha("SEMICOLON", NULL); printf("%s\n", yytext); return SEMICOLON; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 56 "analisador.l"
+#line 54 "analisador.l"
 { yylval = folha("COMMA", NULL); printf("%s ", yytext); return COMMA; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 57 "analisador.l"
+#line 55 "analisador.l"
 { yylval = folha("LPAREN", NULL); printf("%s", yytext); return LPAREN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 58 "analisador.l"
+#line 56 "analisador.l"
 { yylval = folha("RPAREN", NULL); printf("%s ", yytext); return RPAREN; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 59 "analisador.l"
+#line 57 "analisador.l"
 { yylval = folha("LBRACE", NULL); printf("%s ", yytext); return LBRACE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 60 "analisador.l"
+#line 58 "analisador.l"
 { yylval = folha("RBRACE", NULL); printf("%s ", yytext); return RBRACE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 61 "analisador.l"
+#line 59 "analisador.l"
 { yylval = folha("LBRACE", NULL); printf("\n%s\n", yytext); return LBRACE; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 62 "analisador.l"
+#line 60 "analisador.l"
 { yylval = folha("RBRACE", NULL); printf("\n%s\n", yytext); return RBRACE; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 63 "analisador.l"
+#line 61 "analisador.l"
 { yylval = folha("LEQ", NULL); printf("%s ", yytext); return LEQ; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 64 "analisador.l"
+#line 62 "analisador.l"
 { yylval = folha("GEQ", NULL); printf("%s ", yytext); return GEQ; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 65 "analisador.l"
+#line 63 "analisador.l"
 { yylval = folha("EQ", NULL); printf("%s ", yytext); return EQ; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 66 "analisador.l"
+#line 64 "analisador.l"
 { yylval = folha("NEQ", NULL); printf("%s ", yytext); return NEQ; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 67 "analisador.l"
+#line 65 "analisador.l"
 { yylval = folha("LT", NULL); printf("%s ", yytext); return LT; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 68 "analisador.l"
+#line 66 "analisador.l"
 { yylval = folha("GT", NULL); printf("%s ", yytext); return GT; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 70 "analisador.l"
+#line 68 "analisador.l"
 { /* Ignora espaços e tabulações */ }
 	YY_BREAK
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 71 "analisador.l"
+#line 69 "analisador.l"
 { yylineno++; printf("\n"); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 73 "analisador.l"
+#line 71 "analisador.l"
 { /* Ignora comentários de linha */ }
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 74 "analisador.l"
+#line 72 "analisador.l"
 {
     int i;
     for (i = 0; yytext[i] != '\0'; i++) {
@@ -954,15 +952,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 84 "analisador.l"
+#line 82 "analisador.l"
 { printf("ERRO LÉXICO: caractere inválido '%s' LINHA: %d\n", yytext, yylineno); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 86 "analisador.l"
+#line 84 "analisador.l"
 ECHO;
 	YY_BREAK
-#line 966 "lex.yy.c"
+#line 964 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1967,7 +1965,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 86 "analisador.l"
+#line 84 "analisador.l"
 
 
 int yywrap() {

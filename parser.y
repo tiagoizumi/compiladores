@@ -6,7 +6,7 @@
 
 extern int yylineno;
 extern char *yytext;
-void yyerror(const char *s);%
+void yyerror(const char *s);
 int yylex();
 #define MAX_SCOPE_DEPTH 10
 
@@ -236,7 +236,7 @@ expressao:
             $$ = cria_no("expressao", "ASSIGN", NULL, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);
         }
         else{
-            fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (incompatível com declaração)\n", $2->identificador, yylineno);
+            fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (incompatível com declaração)\n", $1->filho1->identificador, yylineno);
             exit(1);
         }
     }

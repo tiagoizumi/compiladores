@@ -78,7 +78,7 @@ int ja_declarado(char *nome, char *tipo, char *escopo) {
 int verifica_compatibilidade(char *nome, char *tipo, char *escopo) {
     Simbolo *atual = tabela_simbolos;
     while (atual) {
-        if(strcmp(atual->escopo, escopo) == 0 && strcmp(atual->nome, nome) == 0 && strcmp(atual->tipo, tipo)) {
+        if(strcmp(atual->escopo, escopo) == 0 && strcmp(atual->nome, nome) == 0 && strcmp(atual->tipo, tipo) == 0) {
             return 1;
         }
         atual = atual->prox;
