@@ -233,8 +233,14 @@ retorno_decl:
 
 expressao:
     var ASSIGN expressao {
-        $$ = cria_no("expressao", "ASSIGN", NULL, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);
+        if (verifica_compatibilidade($1->filho1->identificador, "int", currScope)){
+            $$ = cria_no("expressao", "ASSIGN", NULL, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);
         }
+        else{
+            fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (incompatível com declaração)\n", $2->identificador, yylineno);
+            exit(1);
+        }
+    }
     | simples_expressao {$$ = cria_no("expressao", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
 
 var:
