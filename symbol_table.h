@@ -10,5 +10,7 @@ void adiciona_simbolo(char *nome, char *tipo, char *escopo);
 Simbolo* busca_simbolo(char *nome, char *escopo);
 void libera_tabela_simbolos();
 void imprime_tabela_simbolos();
+int ja_declarado(char *nome, char *tipo, char *escopo);
+int verifica_compatibilidade(char *nome, char *tipo, char *escopo);
 
 #endif // TABELA_SIMBOLOS_H

@@ -65,8 +65,30 @@ void libera_tabela_simbolos() {
 void imprime_tabela_simbolos() {
     Simbolo *atual = tabela_simbolos;
     while (atual) {
-        printf("Nome: %20s, Tipo: %10s, Escopo: %10s\n", atual->nome, atual->tipo, 
+        printf("Nome: %20s, Tipo: %20s, Escopo: %10s\n", atual->nome, atual->tipo, 
                atual->escopo ? atual->escopo : "Global");
         atual = atual->prox;
     }
+}
+
+int ja_declarado(char *nome, char *tipo, char *escopo) {
+    Simbolo *atual = tabela_simbolos;
+    while (atual) {
+        if(strcmp(atual->escopo, escopo) == 0 && strcmp(atual->nome, nome) == 0) {
+            return 1;
+        }
+        atual = atual->prox;
+    }
+    return 0;
+}
+
+int verifica_compatibilidade(char *nome, char *tipo, char *escopo) {
+    Simbolo *atual = tabela_simbolos;
+    while (atual) {
+        if(strcmp(atual->escopo, escopo) == 0 && strcmp(atual->nome, nome) == 0 && strcmp(atual->tipo, tipo)) {
+            return 1;
+        }
+        atual = atual->prox;
+    }
+    return 0;
 }

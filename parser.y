@@ -14,24 +14,22 @@ char currScope[30] = "main";  // Current scope
 char scopeStack[MAX_SCOPE_DEPTH][30];  // Stack to track nested scopes
 int scopeDepth = 0;  // Current depth of the scope stack
 
-// Push the current scope onto the stack
 void pushScope() {
     if (scopeDepth < MAX_SCOPE_DEPTH) {
         strcpy(scopeStack[scopeDepth], currScope);
         scopeDepth++;
     } else {
-        fprintf(stderr, "Scope stack overflow!\n");
+        fprintf(stderr, "Limite da pilha de escopos atingido\n");
         exit(1);
     }
 }
 
-// Pop the previous scope from the stack
 void popScope() {
     if (scopeDepth > 0) {
         scopeDepth--;
         strcpy(currScope, scopeStack[scopeDepth]);
     } else {
-        fprintf(stderr, "Scope stack underflow!\n");
+        fprintf(stderr, "Pilha zerada\n");
         exit(1);
     }
 }
@@ -145,6 +143,10 @@ declaracao:
 var_declaracao:
     tipo_especificador ID SEMICOLON { 
         $$ = cria_no("var_declaracao", NULL, $2->identificador, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);
+        if (ja_declarado($2->identificador, $1->valor, currScope)){
+            fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (variável já declarada)\n", $2->identificador, yylineno);
+            exit(1);
+        }
         adiciona_simbolo($2->identificador, $1->valor, currScope); // Adiciona à tabela
     };
 
@@ -156,7 +158,15 @@ fun_declaracao:
     tipo_especificador ID {strcpy(currScope, $2->identificador); pushScope();} LPAREN params RPAREN composto_decl {
         popScope();
         $$ = cria_no("fun_declaracao", NULL, NULL, $1, $2, $4, $5, $6, $7, NULL, NULL); 
-        adiciona_simbolo($2->identificador, $1->valor, currScope);
+        if (ja_declarado($2->identificador, $1->valor, currScope)){
+            fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (função já declarada)\n", $2->identificador, yylineno);
+            exit(1);
+        }
+        char val[30];
+        strcpy(val, $1->valor);
+        strcat(val, " function");
+
+        adiciona_simbolo($2->identificador, val, currScope);
     };
 
 params:
@@ -170,13 +180,21 @@ param_lista:
 param:
     tipo_especificador ID {
         $$ = cria_no("param", NULL, NULL, $1, $2, NULL, NULL, NULL, NULL, NULL, NULL);
-        adiciona_simbolo($2->identificador, $1->valor, currScope);
+        if (ja_declarado($2->identificador, $1->valor, currScope)){
+            fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (parâmetro já declarado)\n", $2->identificador, yylineno);
+            exit(1);
         }
+        adiciona_simbolo($2->identificador, $1->valor, currScope);
+    }
     | tipo_especificador ID LBRACE RBRACE {
         $$ = cria_no("param", NULL, NULL, $1, $2, $3, $4, NULL, NULL, NULL, NULL);
         char val[100];
         strcpy(val, $1->valor);
-        strcat(val, "*");
+        strcat(val, " *");
+        if (ja_declarado($2->identificador, $1->valor, currScope)){
+            fprintf(stderr, "ERRO SEMÂNTICO : \"%s\" LINHA: %d (parâmetro já declarado)\n", $2->identificador, yylineno);
+            exit(1);
+        }
         adiciona_simbolo($2->identificador, val, currScope);
         };
 
@@ -214,7 +232,9 @@ retorno_decl:
     | RETURN expressao SEMICOLON {$$ = cria_no("retorno_decl", "RETURN", NULL, folha("RETURN", NULL), $2, $3, NULL, NULL, NULL, NULL, NULL);};
 
 expressao:
-    var ASSIGN expressao {$$ = cria_no("expressao", "ASSIGN", NULL, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);}
+    var ASSIGN expressao {
+        $$ = cria_no("expressao", "ASSIGN", NULL, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);
+        }
     | simples_expressao {$$ = cria_no("expressao", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
 
 var:
