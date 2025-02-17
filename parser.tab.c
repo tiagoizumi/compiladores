@@ -1531,7 +1531,7 @@ yyreduce:
   case 34: /* expressao: var ASSIGN expressao  */
 #line 234 "parser.y"
                          {
-        if (verifica_compatibilidade(yyvsp[-2]->filho1->identificador, "int", currScope)){
+        if (verifica_compatibilidade(yyvsp[-2]->filho1->identificador, yyvsp[-2]->identificador, currScope)){
             yyval = cria_no("expressao", "ASSIGN", NULL, yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL, NULL);
         }
         else{
@@ -1550,13 +1550,13 @@ yyreduce:
 
   case 36: /* var: ID  */
 #line 246 "parser.y"
-       {yyval = cria_no("var", "ID", NULL, yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+       {yyval = cria_no("var", "ID", "int", yyvsp[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
 #line 1555 "parser.tab.c"
     break;
 
   case 37: /* var: ID LBRACE expressao RBRACE  */
 #line 247 "parser.y"
-                                 {yyval = cria_no("var", "ID[LBRACE-EXP-RBRACE]", NULL, yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);}
+                                 {yyval = cria_no("var", "ID[LBRACE-EXP-RBRACE]", "int *", yyvsp[-3], yyvsp[-2], yyvsp[-1], yyvsp[0], NULL, NULL, NULL, NULL);}
 #line 1561 "parser.tab.c"
     break;
 

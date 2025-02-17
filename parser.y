@@ -232,7 +232,7 @@ retorno_decl:
 
 expressao:
     var ASSIGN expressao {
-        if (verifica_compatibilidade($1->filho1->identificador, "int", currScope)){
+        if (verifica_compatibilidade($1->filho1->identificador, $1->identificador, currScope)){
             $$ = cria_no("expressao", "ASSIGN", NULL, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);
         }
         else{
@@ -243,8 +243,8 @@ expressao:
     | simples_expressao {$$ = cria_no("expressao", NULL, NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);};
 
 var:
-    ID {$$ = cria_no("var", "ID", NULL, $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
-    | ID LBRACE expressao RBRACE {$$ = cria_no("var", "ID[LBRACE-EXP-RBRACE]", NULL, $1, $2, $3, $4, NULL, NULL, NULL, NULL);};
+    ID {$$ = cria_no("var", "ID", "int", $1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);}
+    | ID LBRACE expressao RBRACE {$$ = cria_no("var", "ID[LBRACE-EXP-RBRACE]", "int *", $1, $2, $3, $4, NULL, NULL, NULL, NULL);};
 
 simples_expressao:
     soma_expressao relacional soma_expressao {$$ = cria_no("simples_expressao", NULL, NULL, $1, $2, $3, NULL, NULL, NULL, NULL, NULL);}
