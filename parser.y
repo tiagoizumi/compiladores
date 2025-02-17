@@ -174,7 +174,10 @@ param:
         }
     | tipo_especificador ID LBRACE RBRACE {
         $$ = cria_no("param", NULL, NULL, $1, $2, $3, $4, NULL, NULL, NULL, NULL);
-        adiciona_simbolo($2->identificador, $1->valor, currScope);
+        char val[100];
+        strcpy(val, $1->valor);
+        strcat(val, "*");
+        adiciona_simbolo($2->identificador, val, currScope);
         };
 
 composto_decl:
